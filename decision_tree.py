@@ -4,9 +4,9 @@ from data_process import process_dataset
 class DecisionTree:
     def __init__(self, train_data, train_label, feature_dict, root=None, threshold=5):
         '''
-        :param train_data:
-        :param train_label:
-        :param feature_dict:
+        :param train_data: encode attribute list
+        :param train_label: encode label list
+        :param feature_dict: dict list  key:encode val:feature (attribute & label)
         :param threshold: when |S| < threshold, it is too small
         '''
         self.train_data = train_data
@@ -101,14 +101,16 @@ class DecisionTree:
 
         return tree_node
 
-    def is_same_class(self, label_list):
+    @staticmethod
+    def is_same_class(label_list):
         first_label = label_list[0]
         for label in label_list:
             if first_label != label:
                 return -1
         return first_label
 
-    def is_same_attribute(self, data_list):
+    @staticmethod
+    def is_same_attribute(data_list):
         first_row = data_list[0]
         for row in data_list:
             if not row == first_row:
