@@ -71,6 +71,7 @@ class DecisionTree:
             return tree_node
         else:
             next_attr_idx = attr_idx + 1
+
         # find split with best GINI
         gini_list = []
         key_list = []
@@ -82,6 +83,7 @@ class DecisionTree:
             key_list.append(key)
         best_index = gini_list.index(min(gini_list))  # find min gini
         best_attr = key_list[best_index]  # encode attr
+
         # split into subset S1 and S2
         data_list1, label_list1, data_list2, label_list2 = self.split_dataset(
             data_list, label_list, next_attr_idx, best_attr)
