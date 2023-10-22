@@ -3,10 +3,10 @@ import csv
 
 def process_dataset(file_path='adult/adult.data'):
     cleaned = clean_data(file_path)
-    data, feature_dict = encode(cleaned)
+    data, feature_dict, continuous_features, category_features = encode(cleaned)
     train_data = map(lambda row: row[:-1], data)
     train_label = map(lambda row: row[-1], data)
-    return list(train_data), list(train_label), feature_dict
+    return list(train_data), list(train_label), feature_dict, continuous_features, category_features
 
 def clean_data(file_path):
     # read the training data as 2d list
@@ -97,8 +97,9 @@ def encode(cleaned):
     # print("Data after transform: \n", backToRows[0])
     # print("Convert to readable form using feature dictionary: \n",make_readable(backToRows[0], feature_dict))
     # print(feature_dict)
-    return backToRows, feature_dict
+    return backToRows, feature_dict, continuous_features, category_features
 
 
 if __name__ == '__main__':
-    process_dataset()
+    train_data, train_label, feature_dict, continuous_features, category_features = process_dataset()
+    print(feature_dict)

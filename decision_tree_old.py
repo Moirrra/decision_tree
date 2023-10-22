@@ -1,6 +1,7 @@
 from tree_node import TreeNode
 from data_process import process_dataset
 
+
 class DecisionTree:
     def __init__(self, train_data, train_label, feature_dict, root=None, threshold=5):
         '''
@@ -60,12 +61,8 @@ class DecisionTree:
             return tree_node
 
         # find the best split
-        if attr_idx == -1:
-            feature = self.feature_dict[0]
-        else:
-            feature = self.feature_dict[attr_idx]
         # get feature index for next split
-        if attr_idx == len(self.feature_dict) - 1 - 1: # index out of scope
+        if attr_idx == len(self.feature_dict) - 1 - 1:  # index out of scope
             tree_node.is_leave = True
             tree_node.result = self.get_majority_label(label_list)
             return tree_node
@@ -73,31 +70,37 @@ class DecisionTree:
             next_attr_idx = attr_idx + 1
 
         # find split with best GINI
+        feature = self.feature_dict[next_attr_idx]
+        print("feature:" + str(feature))
         gini_list = []
         key_list = []
         for key in feature.keys():
+            # split by key at next_attr_idx
             data_list1, label_list1, data_list2, label_list2 = self.split_dataset(
                 data_list, label_list, next_attr_idx, key)
+            print(str(len(data_list1)) + " " + str(len(data_list2)))
             gini = self.cal_split_gini(data_list1, label_list1, data_list2, label_list2)
             gini_list.append(gini)
             key_list.append(key)
+        print(str(gini_list))
         best_index = gini_list.index(min(gini_list))  # find min gini
         best_attr = key_list[best_index]  # encode attr
 
         # split into subset S1 and S2
         data_list1, label_list1, data_list2, label_list2 = self.split_dataset(
             data_list, label_list, next_attr_idx, best_attr)
+        print("s1:" + str(len(data_list1)) + " s2:" + str(len(data_list2)))
         # create tree for S1 and S2
         if len(data_list1) > 0:
             tree_node.true_brunch = self.create_tree(data_list1, label_list1, next_attr_idx, best_attr)
-        else: # s1 is empty
+        else:  # s1 is empty
             result = self.get_majority_label(label_list)
             tree_node.true_brunch = TreeNode(is_leave=True, result=result, attr_idx=next_attr_idx, attr_val=best_attr)
         if len(data_list2) > 0:
-            tree_node.false_brunch = self.create_tree(data_list2, label_list2, next_attr_idx, best_attr)
-        else: # s2 is empty
+            tree_node.false_brunch = self.create_tree(data_list2, label_list2, next_attr_idx, -1)
+        else:  # s2 is empty
             result = self.get_majority_label(label_list)
-            tree_node.false_brunch = TreeNode(is_leave=True, result=result, attr_idx=next_attr_idx, attr_val=best_attr)
+            tree_node.false_brunch = TreeNode(is_leave=True, result=result, attr_idx=next_attr_idx, attr_val=-1)
 
         return tree_node
 
@@ -128,13 +131,13 @@ class DecisionTree:
         label_list1 = []
         label_list2 = []
         for data, label in zip(data_list, label_list):
-            if data[attr_idx] <= attr_val:
+            if int(data[attr_idx]) <= int(attr_val):
                 data_list1.append(data)
                 label_list1.append(label)
             else:
                 data_list2.append(data)
                 label_list2.append(label)
-
+        print("split by key=" + str(attr_val) + " at next_attr_idx=" + str(attr_idx))
         return data_list1, label_list1, data_list2, label_list2
 
     def cal_split_gini(self, data_list1, label_list1, data_list2, label_list2):
@@ -143,7 +146,7 @@ class DecisionTree:
         s = s1 + s2
         gini1 = self.cal_gini(data_list1, label_list1)
         gini2 = self.cal_gini(data_list2, label_list2)
-        return round(s1/s, 2) * gini1 + round(s2/s, 2) * gini2
+        return round(round(s1/s, 4) * gini1 + round(s2/s, 4) * gini2, 4)
 
     @staticmethod
     def cal_gini(data_list, label_list):
@@ -151,9 +154,9 @@ class DecisionTree:
         if n == 0:
             return 1
         ny = len(list(filter(lambda x: x == 1, label_list)))
-        py = round(ny/n, 2)
-        pn = 1 - py
-        return 1 - (py * py + pn * pn)
+        py = round(ny/n, 4)
+        pn = round(1-py, 4)
+        return round(1 - (py * py + pn * pn), 4)
 
     def classify(self, data):
         return self.traverse(self.root, data)
@@ -173,18 +176,15 @@ class DecisionTree:
         return -1
 
 
-
 if __name__ == '__main__':
-    train_data, train_label, feature_dict = process_dataset()
+    train_data, train_label, feature_dict = process_dataset("adult/adult.data")
     decision_tree = DecisionTree(train_data,train_label,feature_dict, threshold=5)
     decision_tree.create_tree(train_data,train_label)
     # test
-    test_data, test_label, test_dict = process_dataset("./adult/adult.test")
+    test_data, test_label, test_dict = process_dataset("adult/adult.test")
     cnt = 0
     sum = len(test_data)
     for i in range(sum):
         if decision_tree.classify(test_data[i]) == test_label[i]:
             cnt += 1
-
     print(round(cnt / sum, 4))
-
