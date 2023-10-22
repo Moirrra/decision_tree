@@ -13,7 +13,7 @@ def clean_data(file_path):
     with open(file_path, newline='') as csvfile:
         data = list(csv.reader(csvfile))
     if file_path.find('.test') != -1:
-        data = data[1:len(data)-1]
+        data = data[1:len(data)-1]  # remove first text row
     else:
         data = data[:len(data)-1]  # There is a white space before each string. Strip white space
     print("The size of the data: ", len(data), len(data[0]))
