@@ -1,7 +1,7 @@
 import csv
 
 
-def process_dataset(file_path='./adult/adult.data'):
+def process_dataset(file_path='adult/adult.data'):
     cleaned = clean_data(file_path)
     data, feature_dict = encode(cleaned)
     train_data = map(lambda row: row[:-1], data)
@@ -10,9 +10,12 @@ def process_dataset(file_path='./adult/adult.data'):
 
 def clean_data(file_path):
     # read the training data as 2d list
-    with open('./adult/adult.data', newline='') as csvfile:
+    with open(file_path, newline='') as csvfile:
         data = list(csv.reader(csvfile))
-    data = data[:len(data)-1]  # There is a white space before each string. Strip white space
+    if file_path.find('.test') != -1:
+        data = data[1:len(data)-1]
+    else:
+        data = data[:len(data)-1]  # There is a white space before each string. Strip white space
     print("The size of the data: ", len(data), len(data[0]))
     for i in range(len(data)):  # There is a white space before each string. Strip white space
         data[i] = [s.strip() for s in data[i]]
