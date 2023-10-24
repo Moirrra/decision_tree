@@ -1,7 +1,6 @@
 import csv
 import json
 import os.path
-import string
 
 
 def process_dataset(file_path='adult/adult.data'):
@@ -22,7 +21,7 @@ def clean_data(file_path):
         data = data[:len(data)-1]  # There is a blank line in the end
     print("The size of the data before preprocessing: ", len(data), len(data[0]))
     for i in range(len(data)):  # There is a white space before each string. Strip white space and remove dot
-        data[i] = [s.strip().removesuffix('.') for s in data[i]]
+        data[i] = [s.strip().rstrip('.') for s in data[i]]
     cleaned = [row for row in data if not any(el == '?' for el in row)]  # remove entries that contain "?"
     [row.pop(13) for row in cleaned]  # remove the 'native-country' column
     print("The size of the data after preprocessing: ", len(cleaned), len(cleaned[0]))
@@ -77,21 +76,17 @@ def encode(cleaned, file_path='my_dict.json'):
         for i in category_features:
             lookup_values = set(columns[i])
             category_dict.append(dict(zip(range(len(lookup_values)),lookup_values)))
-        # age: <=20,21-30,31-40,41-50,51-60,61+
-        # continuous_dict.append(dict(zip(range(6),['20','30','40','50','60','60+'])))
+        # age: <=30,31-40,41-50,51-60,61+
         continuous_dict.append(dict(zip(range(5), ['30', '40', '50', '60', '60+'])))
-        # fnlwgt(in 1e6): <=0.1, 0.1-0.2, ..., 0.6+
-        # continuous_dict.append(dict(zip(range(7),['100000','200000','300000','400000','500000','600000','600000+'])))
+        # fnlwgt(in 1e6): <=0.6, 0.6+
         continuous_dict.append(dict(zip(range(2), ['600000', '600000+'])))
-        # education-num: <=8, 8-9, 9-10, ..., 15-16
-        # continuous_dict.append(dict(zip(range(9),['8','9','10','11','12','13','14','15','16'])))
+        # education-num: <=11, 11-15, 15+
         continuous_dict.append(dict(zip(range(3), ['11', '15', '15+'])))
         # captital-gain: <=5000, 5000-10000, 10000-15000, 15000-20000, 20000+
         continuous_dict.append(dict(zip(range(5),['5000','10000','15000','20000','20000+'])))
         # capital-loss: <=1000, 1000-1500, 1500-2000, 2000+
         continuous_dict.append(dict(zip(range(4),['1000','1500','2000','2000+'])))
-        # hours-per-week: <=10, 10-20, 20-30, 30-40, 40-50, 50-60, 60+
-        # continuous_dict.append(dict(zip(range(7),['10','20','30','40','50','60','60+'])))
+        # hours-per-week: <=20, 20-40, 40+
         continuous_dict.append(dict(zip(range(3), ['20', '40', '40+'])))
 
         # create full list of feature dictionary, transform data accordingly
