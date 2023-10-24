@@ -1,6 +1,11 @@
 from decision_tree import DecisionTree
 from data_process import process_dataset
+import os
 
+# Uncomment if feature dictionary is modified
+# if os.path.exists('my_dict.json'):
+#     os.remove('my_dict.json')
+#     print("Previous feature dictionary deleted.")
 train_data, train_label, feature_dict_list, continuous_features, category_features = process_dataset("adult/adult.data")
 feature_list = [i for i in range(len(train_data[0]))]
 decision_tree = DecisionTree(train_data, train_label, feature_dict_list, continuous_features, threshold=5)
