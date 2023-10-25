@@ -134,7 +134,12 @@ class DecisionTree:
             min_gini = 0.5
             feature_val = -1
             if feature_idx in self.continuous_features:  # continuous features
+                dict_len = len(feature_dict)
+                cnt = 0
                 for val in feature_dict.keys():
+                    if cnt == dict_len - 1:  # last val no need to split
+                        break
+                    cnt += 1
                     data_list1, label_list1, data_list2, label_list2 = self.split_dataset(
                         data_list, label_list, feature_idx, val, is_continuous=True)
                     gini = self.cal_split_gini(data_list1, label_list1, data_list2, label_list2)
