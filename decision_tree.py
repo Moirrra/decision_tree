@@ -7,6 +7,7 @@ class DecisionTree:
     :param train_data: encode attribute list
     :param train_label: encode label list
     :param feature_dict_list: dict list  key:encode val:feature (attribute & label)
+    :param continuous_features: index of continuous feature
     :param root: root treenode
     :param threshold: when |S| < threshold, it is too small
     :type train_data:
@@ -40,28 +41,12 @@ class DecisionTree:
             raise ValueError("length of data_list does NOT match length of label_list")
 
     def create_tree(self, data_list, label_list, attr_idx=-1, attr_val=-1, feature_idx_list=None):
-        """ Create decision tree recursively
-
-        :param data_list: subset of training data
-        :param label_list: subset of training label
-        :param attr_idx: attribute index of the split
-        :param attr_val: encode attribute value of the split
-        :param feature_idx_list: list of feature indexes not split
-        :type data_list: List[List[int]]
-        :type label_list: [List[int]
-        :type attr_idx: int
-        :type attr_val: int
-        :type feature_idx_list: List[int]
-        :return: treenode with subtrees
-        :rtype: TreeNode
-        """
         try:
             self.check_data(data_list, label_list)
         except Exception as e:
             print(str(e))
             return None
 
-        # print("creating tree... attr_idx=" + str(attr_idx) + " attr_val=" + str(attr_val))
         tree_node = TreeNode(attr_idx=attr_idx, attr_val=attr_val)
         # initialize root node for the first time
         if self.root is None:
@@ -70,23 +55,21 @@ class DecisionTree:
         # if all objects belong to the same class
         only_label = self.is_same_class(label_list)
         if only_label != -1:
-            tree_node.is_leave = True
+            tree_node.is_leaf = True
             tree_node.result = only_label
-            # print("all objects belong to the same class:" + " only_label=" + str(only_label))
             return tree_node  # return a leaf node with the value of this class
 
         # if all objects have the same attribute
         # or |S| is too small
         if self.is_same_attribute(data_list) or len(label_list) < self.threshold:
-            tree_node.is_leave = True
+            tree_node.is_leaf = True
             tree_node.result = self.get_majority_label(label_list)
-            # print("all objects have the same attribute")
             return tree_node
 
         # find the best split
         # get feature index for next split
         if len(feature_idx_list) == 0:
-            tree_node.is_leave = True
+            tree_node.is_leaf = True
             tree_node.result = self.get_majority_label(label_list)
             return tree_node
         # find split with best GINI
@@ -99,18 +82,18 @@ class DecisionTree:
         else:
             data_list1, label_list1, data_list2, label_list2 = self.split_dataset(
                 data_list, label_list, best_attr_idx, best_attr_val, is_continuous=False)
-        # print("s1:" + str(len(data_list1)) + " s2:" + str(len(data_list2)))
+
         # create tree for S1 and S2
         if len(data_list1) > 0:  # get subtree
             tree_node.true_brunch = self.create_tree(data_list1, label_list1, best_attr_idx, best_attr_val, feature_idx_list)
         else:  # s1 is empty
             result = self.get_majority_label(label_list)
-            tree_node.true_brunch = TreeNode(is_leave=True, result=result, attr_idx=best_attr_idx, attr_val=best_attr_val)
+            tree_node.true_brunch = TreeNode(is_leaf=True, result=result, attr_idx=best_attr_idx, attr_val=best_attr_val)
         if len(data_list2) > 0:  # get subtree
             tree_node.false_brunch = self.create_tree(data_list2, label_list2, best_attr_idx, -1, feature_idx_list)
         else:  # s2 is empty
             result = self.get_majority_label(label_list)
-            tree_node.false_brunch = TreeNode(is_leave=True, result=result, attr_idx=best_attr_idx, attr_val=-1)
+            tree_node.false_brunch = TreeNode(is_leaf=True, result=result, attr_idx=best_attr_idx, attr_val=-1)
 
         return tree_node
 
@@ -302,7 +285,7 @@ class DecisionTree:
         """
         if root is None:
             return -1
-        if root.is_leave:
+        if root.is_leaf:
             return root.result
         if root.true_brunch:
             attr_idx = root.true_brunch.attr_idx
@@ -360,7 +343,7 @@ class DecisionTree:
 
         self.tree_plot += ''.join(prefix)
 
-        if not point.is_leave:
+        if not point.is_leaf:
             if point.true_brunch:
                 self.tree_plot += "The splitting feature is " + str(
                     feature[point.true_brunch.attr_idx]) + " " + str(
@@ -375,7 +358,7 @@ class DecisionTree:
         if len(prefix) > 0:
             prefix[-1] = branch if prefix[-1] == tee else space
 
-        if not point.is_leave:
+        if not point.is_leaf:
             if point.true_brunch:
                 self._tree(point.true_brunch, prefix + [tee])
             if point.false_brunch:
