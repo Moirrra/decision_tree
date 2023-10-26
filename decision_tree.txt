@@ -1,0 +1,28 @@
+The splitting feature is marital-status whether Married-spouse-absent
+|- The splitting feature is education-num < 11
+|   |- The splitting feature is capital-gain < 5000
+|   |   |- The splitting feature is age < 30
+|   |   |   |- The splitting feature is capital-loss < 1000
+|   |   |   |   |- The splitting feature is occupation whether Prof-specialty
+|   |   |   |   |   |- The splitting feature is race whether Asian-Pac-Islander
+|   |   |   |   |   |   |- Label is <= 50K
+|   |   |   |   |   |   |_ The splitting feature is relationship whether Wife
+|   |   |   |   |   |        |- Label is <= 50K
+|   |   |   |   |   |        |_ The splitting feature is sex whether Female
+|   |   |   |   |   |             |- The splitting feature is education Masters
+|   |   |   |   |   |             |   |- The splitting feature is workclass whether Local-gov
+|   |   |   |   |   |             |   |   |- The splitting feature is hours-per-week < 40
+|   |   |   |   |   |             |   |   |   |- The splitting feature is fnlwgt < 600000
+|   |   |   |   |   |             |   |   |   |   |- Label is <= 50K
+|   |   |   |   |   |             |   |   |   |   |_ Label is <= 50K
+|   |   |   |   |   |             |   |   |   |_ Label is > 50K
+|   |   |   |   |   |             |   |   |_ Label is > 50K
+|   |   |   |   |   |             |   |_ Label is > 50K
+|   |   |   |   |   |             |_ Label is <= 50K
+|   |   |   |   |   |_ Label is > 50K
+|   |   |   |   |_ Label is > 50K
+|   |   |   |_ Label is > 50K
+|   |   |_ Label is <= 50K
+|   |_ Label is <= 50K
+|_ Label is > 50K
+
