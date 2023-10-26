@@ -61,7 +61,7 @@ class DecisionTree:
             print(str(e))
             return None
 
-        print("creating tree... attr_idx=" + str(attr_idx) + " attr_val=" + str(attr_val))
+        # print("creating tree... attr_idx=" + str(attr_idx) + " attr_val=" + str(attr_val))
         tree_node = TreeNode(attr_idx=attr_idx, attr_val=attr_val)
         # initialize root node for the first time
         if self.root is None:
@@ -158,8 +158,8 @@ class DecisionTree:
                 best_gini = min_gini
                 best_feature_idx = feature_idx
                 best_feature_val = feature_val
-        print("best gini = " + str(best_gini) + " best_feature_idx = " + str(best_feature_idx) +
-              " best_feature_val = " + str(best_feature_val))
+        # print("best gini = " + str(best_gini) + " best_feature_idx = " + str(best_feature_idx) +
+        #       " best_feature_val = " + str(best_feature_val))
         return best_feature_idx, best_feature_val
 
     @staticmethod
@@ -312,3 +312,69 @@ class DecisionTree:
         if root.false_brunch:
             return self.traverse(root.false_brunch, data)
         return -1
+
+    def print_tree(self):
+        output = open("decision_tree.txt", 'w+')
+        print(self._tree(self.root), file=output)
+        output.close()
+
+    def _tree(self, point, prefix=[]):
+        """ Create text description for decision tree
+
+        :param point: treenode
+        :param prefix: used in format
+        :return: Text form of decision tree
+        """
+        space = '     '
+        branch = '│   '
+        tee = '├─ '
+        last = '└─ '
+        feature = ['age', 'workclass', 'fnlwgt', 'education', 'education-num', 'marital-status', 'occupation',
+                   'relationship', 'race', 'sex', 'capital-gain', 'capital-loss', 'hours-per-week']
+        feature_map = [
+            ['< 30', '< 40', '< 50', '< 60', '> 60'],
+            ["whether Without-pay", "whether State-gov", "whether Self-emp-not-inc", "whether Local-gov", "whether Federal-gov", "whether Private",
+             "whether Self-emp-inc"],
+            ["< 600000", "> 600000"],
+            ["Prof-school", "Some-college", "5th-6th", "HS-grad", "11th", "9th", "Doctorate", "Assoc-acdm", "Preschool",
+             "Masters", "7th-8th", "Assoc-voc", "10th", "12th", "1st-4th", "Bachelors"],
+            ["< 11", "< 15", "> 15"],
+            ["whether Married-spouse-absent", "whether Never-married", "whether Widowed", "whether Divorced", "whether Married-AF-spouse",
+             "whether Married-civ-spouse", "Separated"],
+            ["whether Sales", "whether Tech-support", "whether Craft-repair", "whether Armed-Forces", "whether Protective-serv",
+             "whether Handlers-cleaners", "whether Other-service", "whether Machine-op-inspct", "whether Farming-fishing",
+             "whether Priv-house-serv", "whether Adm-clerical", "whetherTransport-moving", "whether Prof-specialty", "whether Exec-managerial"],
+            ["whether Not-in-family", "whether Unmarried", "whether Husband", "whether Own-child", "whether Wife", "whether Other-relative"],
+            ["whether White", "whether Other", "whether Black", "whether Amer-Indian-Eskimo", "whether Asian-Pac-Islander"],
+            ["whether Female", "whether Male"],
+            ["< 5000", "< 10000", "< 15000", "< 20000", "> 20000"],
+            ["< 1000", "< 1500", "< 2000", "> 2000"],
+            ["< 20", "< 40", "> 40"]
+        ]
+
+        if len(prefix) == 0:
+            self.tree_plot = ''
+
+        self.tree_plot += ''.join(prefix)
+
+        if not point.is_leave:
+            if point.true_brunch:
+                self.tree_plot += "The splitting feature is " + str(
+                    feature[point.true_brunch.attr_idx]) + " " + str(
+                    feature_map[point.true_brunch.attr_idx][point.true_brunch.attr_val]) + "\n"
+        else:
+            if point.result == 0:
+                self.tree_plot += "Label is <= 50K\n"
+                # print("Label is <= 50K,", file=output, end='\t')
+            else:
+                self.tree_plot += "Label is > 50K\n"
+
+        if len(prefix) > 0:
+            prefix[-1] = branch if prefix[-1] == tee else space
+
+        if not point.is_leave:
+            if point.true_brunch:
+                self._tree(point.true_brunch, prefix + [tee])
+            if point.false_brunch:
+                self._tree(point.false_brunch, prefix + [last])
+        return self.tree_plot

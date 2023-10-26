@@ -19,12 +19,12 @@ def clean_data(file_path):
         data = data[1:len(data)-1]  # remove first text row
     else:
         data = data[:len(data)-1]  # There is a blank line in the end
-    print("The size of the data before preprocessing: ", len(data), len(data[0]))
+    # print("The size of the data before preprocessing: ", len(data), len(data[0]))
     for i in range(len(data)):  # There is a white space before each string. Strip white space and remove dot
         data[i] = [s.strip().rstrip('.') for s in data[i]]
     cleaned = [row for row in data if not any(el == '?' for el in row)]  # remove entries that contain "?"
     [row.pop(13) for row in cleaned]  # remove the 'native-country' column
-    print("The size of the data after preprocessing: ", len(cleaned), len(cleaned[0]))
+    # print("The size of the data after preprocessing: ", len(cleaned), len(cleaned[0]))
     return cleaned
 
 
@@ -69,7 +69,7 @@ def encode(cleaned, file_path='my_dict.json'):
         columns[i] = [float(x) for x in columns[i]]
 
     if not os.path.exists(file_path):
-        print("Feature dictionary not found. Creating new...")
+        # print("Feature dictionary not found. Creating new...")
     # create lookup dictionary for categorical and continuous features
         category_dict = []
         continuous_dict=[]
@@ -93,12 +93,15 @@ def encode(cleaned, file_path='my_dict.json'):
         all_features = continuous_features+category_features
         all_dict = continuous_dict+category_dict
         feature_dict = [d for idx, d in sorted(zip(all_features, all_dict))]
-
+        # # treat education as ordinal attribute
+        # feature_dict[3] = {"0": "Preschool", "1": "1st-4th", "2": "5th-6th", "3": "7th-8th", "4": "9th","5": "10th", "6": "11th", "7": "12th", "8": "HS-grad", "9": "Assoc-voc", "10": "Assoc-acdm", "11": "Prof-school", "12": "Some-college", "13": "Bachelors", "14": "Masters", "15": "Doctorate"}
+        # continuous_features = [0,2,3,4,10,11,12]  # column index of features
+        # category_features = [1,5,6,7,8,9,13]
         with open('my_dict.json', 'w') as f:  # save the feature dictionary
             json.dump(feature_dict, f)
-        print("Feature dictionary is created.")
+        # print("Feature dictionary is created.")
     else:
-        print("Found existing feature dictionary.")
+        # print("Found existing feature dictionary.")
         with open('my_dict.json') as f:
             feature_dict = json.load(f)
         for i in range(len(feature_dict)):  # convert keys from str to int
@@ -109,6 +112,8 @@ def encode(cleaned, file_path='my_dict.json'):
     backToRows = list(zip(*columns))  # transpose columns back to rows
     backToRows = [list(row) for row in backToRows]
 
+
+
     print("Data ready to use.")
     # example
     # print("Data size: \n", len(backToRows), len(backToRows[0]))
@@ -117,7 +122,3 @@ def encode(cleaned, file_path='my_dict.json'):
     # print("Convert to readable form using feature dictionary: \n",make_readable(backToRows[0], feature_dict))
     # print(feature_dict)
     return backToRows, feature_dict, continuous_features, category_features
-
-
-if __name__ == '__main__':
-    train_data, train_label, feature_dict, continuous_features, category_features = process_dataset()
