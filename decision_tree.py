@@ -326,9 +326,12 @@ class DecisionTree:
         :return: Text form of decision tree
         """
         space = '     '
-        branch = '│   '
-        tee = '├─ '
-        last = '└─ '
+        # branch = '│   '
+        # tee = '├─ '
+        # last = '└─ '
+        branch = '|   '
+        tee = '|- '
+        last = '|_ '
         feature = ['age', 'workclass', 'fnlwgt', 'education', 'education-num', 'marital-status', 'occupation',
                    'relationship', 'race', 'sex', 'capital-gain', 'capital-loss', 'hours-per-week']
         feature_map = [
