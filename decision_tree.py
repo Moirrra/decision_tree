@@ -41,6 +41,21 @@ class DecisionTree:
             raise ValueError("length of data_list does NOT match length of label_list")
 
     def create_tree(self, data_list, label_list, attr_idx=-1, attr_val=-1, feature_idx_list=None):
+        """ Create decision tree recursively
+
+        :param data_list: subset of training data
+        :param label_list: subset of training label
+        :param attr_idx: attribute index of the split
+        :param attr_val: encode attribute value of the split
+        :param feature_idx_list: list of feature indexes not split
+        :type data_list: List[List[int]]
+        :type label_list: [List[int]
+        :type attr_idx: int
+        :type attr_val: int
+        :type feature_idx_list: List[int]
+        :return: treenode with subtrees
+        :rtype: TreeNode
+        """
         try:
             self.check_data(data_list, label_list)
         except Exception as e:
